@@ -1,14 +1,11 @@
 const express = require("express");
 const router = express.Router();
+const docs = require("../models/docdata.js");
 
-router.get("/", function (req, res, next) {
-  const data = {
-    data: {
-      msg: "Docs",
-    },
-  };
+// get all documents
+router.get("/", (req, res) => docs.getAllDocs(res, req));
 
-  res.json(data);
-});
+// get specific document by id
+router.get("/:id", (req, res) => docs.getOneDoc(res, req.params.id));
 
 module.exports = router;
