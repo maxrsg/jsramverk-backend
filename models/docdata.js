@@ -133,8 +133,8 @@ const docs = {
   },
 
   deleteDoc: async function (res, req) {
-    if (req.body.id) {
-      let _id = req.body.id;
+    if (req.params.id) {
+      let _id = req.params.id;
       let filter = {
         _id: ObjectId(_id),
       };

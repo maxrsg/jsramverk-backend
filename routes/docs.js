@@ -17,6 +17,6 @@ router.post("/", jsonParser, (req, res) => docs.createDoc(res, req));
 router.put("/", jsonParser, (req, res) => docs.updateDoc(res, req));
 
 // delete existing document
-router.delete("/", jsonParser, (req, res) => docs.deleteDoc(res, req));
+router.delete("/:id", jsonParser, (req, res) => docs.deleteDoc(res, req));
 
 module.exports = router;
