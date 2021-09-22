@@ -4,7 +4,6 @@ const config = require("./config.json");
 
 const database = {
   getDb: async function getDb() {
-    // let dsn = `mongodb://localhost:27017/texteditor`;
     let dsn = `mongodb+srv://${config.username}:${config.password}@cluster0.kzv8b.mongodb.net/texteditor?retryWrites=true&w=majority`;
 
     if (process.env.NODE_ENV === "test") {
