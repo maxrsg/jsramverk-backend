@@ -74,7 +74,7 @@ const docs = {
       };
       const result = await db.collection.insertOne(doc);
 
-      return res.status(201).json({ data: result.ops });
+      return res.status(201).json({ id: result.insertedId });
     } catch (e) {
       return res.status(500).json({
         error: {
@@ -107,7 +107,7 @@ const docs = {
           $set: updateDoc,
         });
 
-        return res.status(201).send();
+        return res.status(200).send();
       } catch (e) {
         return res.status(500).json({
           error: {
@@ -144,7 +144,7 @@ const docs = {
         db = await database.getDb();
         await db.collection.deleteOne(filter);
 
-        return res.status(201).send();
+        return res.status(200).send();
       } catch (e) {
         return res.status(500).json({
           error: {

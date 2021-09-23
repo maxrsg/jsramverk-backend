@@ -1,6 +1,5 @@
 const mongo = require("mongodb").MongoClient;
 const collectionName = "editor";
-// const config = require("./config.json");
 
 try {
   config = require("./config.json");
