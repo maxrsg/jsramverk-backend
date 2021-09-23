@@ -1,4 +1,6 @@
-# jsramverk-backend
+# jsramverk-backend 
+[![Build Status](https://app.travis-ci.com/maxrsg/jsramverk-backend.svg?branch=main)](https://app.travis-ci.com/maxrsg/jsramverk-backend)
+
 This project was created as a part of the course [jsramverk](https://jsramverk.se/) at BTH
 
 ## Installation
