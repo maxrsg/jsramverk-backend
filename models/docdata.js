@@ -28,12 +28,14 @@ const docs = {
 
   getOneDoc: async function (res, id) {
     if (id) {
-      let _id = id;
-      let filter = {
-        _id: ObjectId(_id),
-      };
       let db;
+
       try {
+        let _id = id;
+        let filter = {
+          _id: ObjectId(_id),
+        };
+
         db = await database.getDb();
         const object = await db.collection.findOne(filter);
 
@@ -91,13 +93,13 @@ const docs = {
 
   updateDoc: async function (res, req) {
     if (req.body.id) {
-      let _id = req.body.id;
-      let filter = {
-        _id: ObjectId(_id),
-      };
-      let db;
-
       try {
+        let _id = req.body.id;
+        let filter = {
+          _id: ObjectId(_id),
+        };
+        let db;
+
         db = await database.getDb();
         const updateDoc = {
           title: req.body.title,
@@ -134,13 +136,13 @@ const docs = {
 
   deleteDoc: async function (res, req) {
     if (req.params.id) {
-      let _id = req.params.id;
-      let filter = {
-        _id: ObjectId(_id),
-      };
-      let db;
-
       try {
+        let _id = req.params.id;
+        let filter = {
+          _id: ObjectId(_id),
+        };
+        let db;
+
         db = await database.getDb();
         await db.collection.deleteOne(filter);
 

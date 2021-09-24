@@ -35,14 +35,23 @@ describe("docs", () => {
   });
 
   describe("GET /docs when no documents exists", () => {
-    it("should get status 200", (done) => {
+    it("all docs should get status 200", (done) => {
       chai
         .request(server)
         .get("/docs")
         .end((err, res) => {
-          console.log(res.body);
           res.should.have.status(200);
           res.body.should.be.an("object");
+          done();
+        });
+    });
+
+    it("specific doc with invalid id should get status 500", (done) => {
+      chai
+        .request(server)
+        .get("/docs/invalidid")
+        .end((err, res) => {
+          res.should.have.status(500);
           done();
         });
     });
@@ -69,25 +78,23 @@ describe("docs", () => {
     });
   });
 
-  describe("GET /docs, when documents exists", () => {
-    it("all documents should get status 200", (done) => {
+  describe("GET /docs when documents exists", () => {
+    it("all docs should get status 200", (done) => {
       chai
         .request(server)
         .get("/docs")
         .end((err, res) => {
-          console.log(res.body);
           res.should.have.status(200);
           res.body.should.be.an("object");
           done();
         });
     });
 
-    it("specific document should get status 200", (done) => {
+    it("specific doc should get status 200", (done) => {
       chai
         .request(server)
         .get(`/docs/${_id}`)
         .end((err, res) => {
-          console.log(res.body);
           res.should.have.status(200);
           res.body.should.be.an("object");
           done();
@@ -96,7 +103,7 @@ describe("docs", () => {
   });
 
   describe("PUT /docs", () => {
-    it("should get status 200", (done) => {
+    it("valid input data should get status 200", (done) => {
       const document = {
         id: _id,
         title: "put test",
@@ -109,7 +116,22 @@ describe("docs", () => {
         .send(document)
         .end((err, res) => {
           res.should.have.status(200);
-          console.log(res.body);
+          done();
+        });
+    });
+
+    it("input data without id should get status 500", (done) => {
+      const document = {
+        title: "put test",
+        data: "put test",
+      };
+
+      chai
+        .request(server)
+        .put("/docs")
+        .send(document)
+        .end((err, res) => {
+          res.should.have.status(500);
           done();
         });
     });
@@ -122,7 +144,16 @@ describe("docs", () => {
         .delete(`/docs/${_id}`)
         .end((err, res) => {
           res.should.have.status(200);
-          console.log(res.body);
+          done();
+        });
+    });
+
+    it("invalid id should get status 500", (done) => {
+      chai
+        .request(server)
+        .delete(`/docs/invalidid`)
+        .end((err, res) => {
+          res.should.have.status(500);
           done();
         });
     });
