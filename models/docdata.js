@@ -93,12 +93,12 @@ const docs = {
 
   updateDoc: async function (res, req) {
     if (req.body.id) {
+      let db;
       try {
         let _id = req.body.id;
         let filter = {
           _id: ObjectId(_id),
         };
-        let db;
 
         db = await database.getDb();
         const updateDoc = {

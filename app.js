@@ -51,8 +51,9 @@ app.use((err, req, res, next) => {
 
 const io = socketIo(httpServer, {
   cors: {
-    origin: ["http://localhost:3000", " http://172.28.72.68:3000"],
+    origin: ["https://www.student.bth.se", "http://localhost:3000"],
     methods: ["GET", "POST"],
+    credentials: true,
   },
 });
 
