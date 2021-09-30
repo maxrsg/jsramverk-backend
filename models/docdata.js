@@ -134,6 +134,26 @@ const docs = {
     }
   },
 
+  updateDirectly: async function (id, title, data) {
+    let db;
+    try {
+      let filter = {
+        _id: ObjectId(id),
+      };
+
+      db = await database.getDb();
+      const updateDoc = {
+        title: title,
+        data: data,
+      };
+      await db.collection.updateOne(filter, {
+        $set: updateDoc,
+      });
+    } catch (e) {
+      console.log(e);
+    }
+  },
+
   deleteDoc: async function (res, req) {
     if (req.params.id) {
       try {

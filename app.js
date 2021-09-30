@@ -1,12 +1,15 @@
 const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
+const socketIo = require("socket.io");
 
 const app = express();
 const port = process.env.PORT || 1337;
+const httpServer = require("http").createServer(app);
 
 const index = require("./routes/index");
 const docs = require("./routes/docs");
+const docModel = require("./models/docdata");
 
 app.use(cors());
 
@@ -46,7 +49,24 @@ app.use((err, req, res, next) => {
   });
 });
 
-const server = app.listen(port, () =>
+const io = socketIo(httpServer, {
+  cors: {
+    origin: ["http://localhost:3000", " http://172.28.72.68:3000"],
+    methods: ["GET", "POST"],
+  },
+});
+
+io.sockets.on("connection", function (socket) {
+  socket.on("create", function (room) {
+    socket.join(room);
+  });
+  socket.on("doc", function (data) {
+    socket.to(data["_id"]).emit("doc", data);
+    docModel.updateDirectly(data._id, data.title, data.data);
+  });
+});
+
+const server = httpServer.listen(port, () =>
   console.log(`Server listening on port ${port}!`)
 );
 
