@@ -13,6 +13,7 @@ const password = process.env.DB_PASSWORD || config.password;
 const database = {
   getDb: async function getDb() {
     let dsn = `mongodb+srv://${username}:${password}@cluster0.kzv8b.mongodb.net/texteditor?retryWrites=true&w=majority`;
+    // const collectionName = collection;
 
     if (process.env.NODE_ENV === "test") {
       dsn = "mongodb://localhost:27017/test";

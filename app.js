@@ -10,6 +10,7 @@ const httpServer = require("http").createServer(app);
 const index = require("./routes/index");
 const docs = require("./routes/docs");
 const docModel = require("./models/docdata");
+const users = require("./routes/users");
 
 app.use(cors());
 
@@ -25,6 +26,7 @@ app.use((req, res, next) => {
 
 app.use("/", index);
 app.use("/docs", docs);
+app.use("/users", users);
 
 // 404 error
 app.use((req, res, next) => {
