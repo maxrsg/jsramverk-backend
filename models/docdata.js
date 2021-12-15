@@ -7,10 +7,27 @@ const docs = {
 
     try {
       db = await database.getDb();
-      const resultSet = await db.collection.find({}).toArray();
+      const userEmail = req.user.email;
+      const resultSet = await db.collection.findOne({ email: userEmail });
+
+      const shared = await db.collection
+        .find({ docs: { $elemMatch: { allowedUsers: userEmail } } })
+        .toArray();
+
+      let sharedDocs = [];
+      shared.forEach((user) => {
+        let docs = user.docs;
+        docs.forEach((doc) => {
+          if (doc.allowedUsers.includes(userEmail)) {
+            doc.creator = user.email;
+            sharedDocs.push(doc);
+          }
+        });
+      });
 
       return res.status(200).json({
-        data: resultSet,
+        data: resultSet.docs,
+        shared: sharedDocs,
       });
     } catch (e) {
       return res.status(500).json({
@@ -26,21 +43,22 @@ const docs = {
     }
   },
 
-  getOneDoc: async function (res, id) {
-    if (id) {
+  getOneDoc: async function (res, req) {
+    if (req.params.id) {
       let db;
 
       try {
-        let _id = id;
-        let filter = {
-          _id: ObjectId(_id),
+        const userEmail = req.user.email;
+        let userFilter = {
+          email: userEmail,
         };
-
+        let _id = req.params.id;
         db = await database.getDb();
-        const object = await db.collection.findOne(filter);
+        const user = await db.collection.findOne(userFilter);
+        const doc = user.docs.find((document) => document._id == _id);
 
         return res.status(200).json({
-          data: object,
+          data: doc,
         });
       } catch (e) {
         return res.status(500).json({
@@ -65,18 +83,77 @@ const docs = {
       });
     }
   },
+
+  getDocFromCreator: async function (res, req) {
+    if (req.params.id && req.params.creator) {
+      let db;
+
+      try {
+        const userEmail = req.user.email;
+        const creatorEmail = req.params.creator;
+        const _id = req.params.id;
+
+        let creatorFilter = {
+          email: creatorEmail,
+        };
+
+        db = await database.getDb();
+        const user = await db.collection.findOne(creatorFilter);
+        const doc = user.docs.find((document) => document._id == _id);
+        if (doc.allowedUsers.includes(userEmail)) {
+          return res.status(200).json({
+            data: doc,
+          });
+        }
+      } catch (e) {
+        return res.status(500).json({
+          error: {
+            status: 500,
+            path: "/docs/one",
+            title: "Database error",
+            message: e.message,
+          },
+        });
+      } finally {
+        await db.client.close();
+      }
+    } else {
+      return res.status(500).json({
+        error: {
+          status: 500,
+          path: "/docs/one no id",
+          title: "No id",
+          message: "No data id provided",
+        },
+      });
+    }
+    console.log("heeeej");
+    console.log(req.params);
+  },
+
   createDoc: async function (res, req) {
     let db;
 
     try {
       db = await database.getDb();
+      const userEmail = req.user.email;
+      let filter = {
+        email: userEmail,
+      };
+      let user = await db.collection.findOne(filter);
       const doc = {
+        _id: ObjectId(),
         title: req.body.title,
         data: req.body.data,
+        allowedUsers: req.body.allowedUsers,
       };
-      const result = await db.collection.insertOne(doc);
 
-      return res.status(201).json({ id: result.insertedId });
+      user.docs.push(doc);
+      await db.collection.updateOne(filter, {
+        $set: user,
+      });
+
+      return res.status(201).json({ id: doc._id });
     } catch (e) {
       return res.status(500).json({
         error: {
@@ -96,17 +173,26 @@ const docs = {
       let db;
       try {
         let _id = req.body.id;
-        let filter = {
-          _id: ObjectId(_id),
+        const userEmail = req.user.email;
+        let userFilter = {
+          email: userEmail,
         };
 
         db = await database.getDb();
+        const user = await db.collection.findOne(userFilter);
+
         const updateDoc = {
+          _id: _id,
           title: req.body.title,
           data: req.body.data,
+          allowedUsers: req.body.allowedUsers,
         };
-        await db.collection.updateOne(filter, {
-          $set: updateDoc,
+        let doc = user.docs.find((document) => document._id == _id);
+        const docIndex = user.docs.indexOf(doc);
+
+        user.docs[docIndex] = updateDoc;
+        await db.collection.updateOne(userFilter, {
+          $set: user,
         });
 
         return res.status(200).send();

@@ -50,10 +50,7 @@ const auth = {
           docs: [],
         };
 
-        const res = await db.collection.insertOne(user);
-        // const token = jwt.sign({ _id: res.insertedId }, jwtSecret, {
-        //   expiresIn: "4h",
-        // });
+        await db.collection.insertOne(user);
 
         return res.status(200).json({
           message: "User registered successfully",
@@ -92,15 +89,6 @@ const auth = {
 
     try {
       db = await database.getDb();
-
-      // const filter = {
-      //   users: {
-      //     $elemMatch: {
-      //       email: email,
-      //     },
-      //   },
-      // };
-
       const user = await db.collection.findOne({ email: email });
 
       if (user) {
@@ -168,7 +156,7 @@ const auth = {
   },
 
   checkToken: function (req, res, next) {
-    let token = req.headers["x-access-token"];
+    const token = req.headers["x-access-token"];
 
     if (token) {
       jwt.verify(token, jwtSecret, function (err, decoded) {
@@ -185,6 +173,8 @@ const auth = {
 
         req.user = {};
         req.user.email = decoded.email;
+        req.user._id = decoded._id;
+        console.log(decoded);
 
         return next();
       });

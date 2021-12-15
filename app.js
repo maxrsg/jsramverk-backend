@@ -65,7 +65,7 @@ io.sockets.on("connection", function (socket) {
   });
   socket.on("doc", function (data) {
     socket.to(data["_id"]).emit("doc", data);
-    docModel.updateDirectly(data._id, data.title, data.data);
+    docModel.updateDirectly(data._id, data.title, data.data, data.allowedUsers);
   });
 });
 
