@@ -173,7 +173,12 @@ const docs = {
       let db;
       try {
         let _id = req.body.id;
-        const userEmail = req.user.email;
+        let userEmail = req.user.email;
+        console.log(req.body);
+        if (req.body.creator) {
+          userEmail = req.body.creator;
+        }
+
         let userFilter = {
           email: userEmail,
         };
@@ -181,14 +186,16 @@ const docs = {
         db = await database.getDb();
         const user = await db.collection.findOne(userFilter);
 
+        let doc = user.docs.find((document) => document._id == _id);
+        const docIndex = user.docs.indexOf(doc);
         const updateDoc = {
           _id: _id,
           title: req.body.title,
           data: req.body.data,
-          allowedUsers: req.body.allowedUsers,
+          allowedUsers: user.docs[docIndex].allowedUsers.concat(
+            req.body.allowedUsers
+          ),
         };
-        let doc = user.docs.find((document) => document._id == _id);
-        const docIndex = user.docs.indexOf(doc);
 
         user.docs[docIndex] = updateDoc;
         await db.collection.updateOne(userFilter, {
