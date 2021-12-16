@@ -227,20 +227,42 @@ const docs = {
     }
   },
 
-  updateDirectly: async function (id, title, data) {
+  updateDirectly: async function (
+    id,
+    title,
+    data,
+    allowedUsers,
+    user,
+    creator
+  ) {
     let db;
     try {
-      let filter = {
-        _id: ObjectId(id),
+      let _id = id;
+      let userEmail = user;
+
+      if (creator) {
+        userEmail = creator;
+      }
+
+      let userFilter = {
+        email: userEmail,
       };
 
       db = await database.getDb();
+      const userObj = await db.collection.findOne(userFilter);
+
+      let doc = userObj.docs.find((document) => document._id == _id);
+      const docIndex = userObj.docs.indexOf(doc);
       const updateDoc = {
+        _id: _id,
         title: title,
         data: data,
+        allowedUsers: userObj.docs[docIndex].allowedUsers.concat(allowedUsers),
       };
-      await db.collection.updateOne(filter, {
-        $set: updateDoc,
+
+      userObj.docs[docIndex] = updateDoc;
+      await db.collection.updateOne(userFilter, {
+        $set: userObj,
       });
     } catch (e) {
       console.log(e);

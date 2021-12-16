@@ -62,10 +62,19 @@ const io = socketIo(httpServer, {
 io.sockets.on("connection", function (socket) {
   socket.on("create", function (room) {
     socket.join(room);
+    console.log("joined: " + room);
   });
   socket.on("doc", function (data) {
+    console.log(data);
     socket.to(data["_id"]).emit("doc", data);
-    docModel.updateDirectly(data._id, data.title, data.data, data.allowedUsers);
+    docModel.updateDirectly(
+      data._id,
+      data.title,
+      data.data,
+      data.allowedUsers,
+      data.user,
+      data.creator || ""
+    );
   });
 });
 
