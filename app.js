@@ -2,15 +2,23 @@ const express = require("express");
 const morgan = require("morgan");
 const cors = require("cors");
 const socketIo = require("socket.io");
+const { graphqlHTTP } = require("express-graphql");
+const { GraphQLSchema } = require("graphql");
 
 const app = express();
 const port = process.env.PORT || 1337;
 const httpServer = require("http").createServer(app);
+const visual = true;
 
 const index = require("./routes/index");
 const docs = require("./routes/docs");
 const docModel = require("./models/docdata");
 const users = require("./routes/users");
+const RootQueryType = require("./graphql/root.js");
+
+const schema = new GraphQLSchema({
+  query: RootQueryType,
+});
 
 app.use(cors());
 
@@ -27,6 +35,13 @@ app.use((req, res, next) => {
 app.use("/", index);
 app.use("/docs", docs);
 app.use("/users", users);
+app.use(
+  "/graphql",
+  graphqlHTTP({
+    schema: schema,
+    graphiql: visual,
+  })
+);
 
 // 404 error
 app.use((req, res, next) => {

@@ -305,6 +305,40 @@ const docs = {
       });
     }
   },
+
+  getAllUsers: async function () {
+    let db;
+
+    try {
+      db = await database.getDb();
+      let users = await db.collection.find({}).toArray();
+      console.log(users);
+      return users;
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await db.client.close();
+    }
+  },
+
+  getUserByEmail: async function (email) {
+    let db;
+
+    try {
+      db = await database.getDb();
+
+      let filter = {
+        email: email,
+      };
+      let user = await db.collection.findOne(filter);
+
+      return user;
+    } catch (e) {
+      console.log(e);
+    } finally {
+      await db.client.close();
+    }
+  },
 };
 
 module.exports = docs;
